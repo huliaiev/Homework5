@@ -11,6 +11,8 @@ public class Main {
 
     static EntityManagerFactory emf;
     static EntityManager em;
+    private static Scanner sc;
+    //Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -23,9 +25,10 @@ public class Main {
                     System.out.println("1: add dish");
                     System.out.println("2: delete dish");
                     System.out.println("3: view all dishes");
-                    System.out.println("4: view dishes cost 'OT --> DO' ");
-                    System.out.println("5: tolko so skidkoy");
-                    System.out.println("6: blyuda s vesom ne bolee 1 kg");
+                    System.out.println("4: view dishes cost 'OT min --> DO max");
+                    System.out.println("5: view dishes cost 'OT --> DO' (vibor diapozon tseny)");
+                    System.out.println("6: tolko so skidkoy");
+                    System.out.println("7: blyuda s vesom ne bolee 1 kg");
                     System.out.print("-> ");
 
                     String s = sc.nextLine();
@@ -42,10 +45,15 @@ public class Main {
                         case "4":
                             viewAllDishesByCost();
                             break;
+
                         case "5":
+                            viewAllDishesByCost1();
+                            break;
+
+                        case "6":
                             viewOnlyDiscount();
                             break;
-                        case "6":
+                        case "7":
                             viewWeightSum();
                             break;
                         default:
@@ -137,6 +145,37 @@ public class Main {
             System.out.println(mr1);
     }
 
+    // вывести список по заданной стоимости
+    private static void viewAllDishesByCost1() {
+        Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr WHERE dishCost != null ", MenuRestaraunt.class);
+
+        List<MenuRestaraunt> list = (List<MenuRestaraunt>) query.getResultList();
+
+        try {
+
+            System.out.println("Введите нижнюю границу цены");
+            String smin = sc.nextLine();
+            Integer min = Integer.parseInt(smin);
+
+            System.out.println("Введите верхнюю границу цены");
+            String smax = sc.nextLine();
+            Integer max = Integer.parseInt(smax);
+
+            double temp = 0;
+
+            for (MenuRestaraunt mr1 : list) {
+                if (temp > min && temp < max) {
+                    System.out.println(mr1);
+                } else {
+                    break;
+                }
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+
+        }
+    }
+
     //Вывести только со скидкой
     private static void viewOnlyDiscount() {
         Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr WHERE discount = true ");
@@ -149,11 +188,19 @@ public class Main {
 
     //Суммарный вес не более 1 кг
     private static void viewWeightSum() {
-        Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr WHERE  dishWeight <= 1 ");
-        List<MenuRestaraunt> list = (List<MenuRestaraunt>) query.getResultList();
+        Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr WHERE  dishWeight != null ");
 
-        for (MenuRestaraunt mr1 : list)
-            System.out.println(mr1);
+        List<MenuRestaraunt> list = (List<MenuRestaraunt>) query.getResultList();
+        double sumWeight = 0;
+
+        for (MenuRestaraunt mr1 : list) {
+            sumWeight = sumWeight + mr1.getDishWeight();
+            if (sumWeight <= 1) {
+                System.out.println(mr1);
+            } else {
+                break;
+            }
+        }
     }
 }
 
