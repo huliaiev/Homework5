@@ -12,10 +12,9 @@ public class Main {
     static EntityManagerFactory emf;
     static EntityManager em;
     private static Scanner sc;
-    //Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+        sc = new Scanner(System.in);
         try {
 
             emf = Persistence.createEntityManagerFactory("JPATest");
@@ -47,7 +46,7 @@ public class Main {
                             break;
 
                         case "5":
-                            viewAllDishesByCost1();
+                            viewAllDishesByCost1(sc);
                             break;
 
                         case "6":
@@ -127,6 +126,7 @@ public class Main {
         }
     }
 
+    //Вывести все блюда
     private static void viewAllDishes() {
         Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr", MenuRestaraunt.class);
         List<MenuRestaraunt> list = (List<MenuRestaraunt>) query.getResultList();
@@ -135,7 +135,7 @@ public class Main {
             System.out.println(mr1);
     }
 
-    //Вывести по стоимости от и до
+    //Вывести все блюда по возрастанию стоимости
     private static void viewAllDishesByCost() {
         Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr  order by dishCost ", MenuRestaraunt.class);
 
@@ -145,36 +145,27 @@ public class Main {
             System.out.println(mr1);
     }
 
-    // вывести список по заданной стоимости
-    private static void viewAllDishesByCost1() {
-        Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr WHERE dishCost != null ", MenuRestaraunt.class);
+    //Вывести блюда в заданной ценовой категории
+    private static void viewAllDishesByCost1(Scanner sc) {
+        System.out.println("Введите нижнюю границу цены");
+        String smin = sc.nextLine();
+        Double min = Double.parseDouble(smin);
+
+        System.out.println("Введите верхнюю границу цены");
+        String smax = sc.nextLine();
+        Double max = Double.parseDouble(smax);
+
+        Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr WHERE dishCost >= :MIN AND dishCost <= :MAX", MenuRestaraunt.class);
+        query.setParameter("MIN", min);
+        query.setParameter("MAX", max);
 
         List<MenuRestaraunt> list = (List<MenuRestaraunt>) query.getResultList();
 
-        try {
-
-            System.out.println("Введите нижнюю границу цены");
-            String smin = sc.nextLine();
-            Integer min = Integer.parseInt(smin);
-
-            System.out.println("Введите верхнюю границу цены");
-            String smax = sc.nextLine();
-            Integer max = Integer.parseInt(smax);
-
-            double temp = 0;
-
-            for (MenuRestaraunt mr1 : list) {
-                if (temp > min && temp < max) {
-                    System.out.println(mr1);
-                } else {
-                    break;
-                }
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-
+        for (MenuRestaraunt mr1 : list) {
+            System.out.println(mr1);
         }
     }
+
 
     //Вывести только со скидкой
     private static void viewOnlyDiscount() {
@@ -203,7 +194,3 @@ public class Main {
         }
     }
 }
-
-
-
-
