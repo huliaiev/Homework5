@@ -1,9 +1,6 @@
 package com.gmail.ahuliaiev;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.util.List;
 import java.util.Scanner;
 
@@ -155,17 +152,21 @@ public class Main {
         String smax = sc.nextLine();
         Double max = Double.parseDouble(smax);
 
-        Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr WHERE dishCost >= :MIN AND dishCost <= :MAX", MenuRestaraunt.class);
-        query.setParameter("MIN", min);
-        query.setParameter("MAX", max);
+        try {
+            Query query = em.createQuery("SELECT mr FROM MenuRestaraunt mr WHERE dishCost >= :MIN AND dishCost <= :MAX", MenuRestaraunt.class);
+            query.setParameter("MIN", min);
+            query.setParameter("MAX", max);
 
-        List<MenuRestaraunt> list = (List<MenuRestaraunt>) query.getResultList();
+            List<MenuRestaraunt> list = (List<MenuRestaraunt>) query.getResultList();
 
-        for (MenuRestaraunt mr1 : list) {
-            System.out.println(mr1);
+            for (MenuRestaraunt mr1 : list) {
+                System.out.println(mr1);
+            }
+        } catch (NoResultException ex) {
+          System.out.println("В такой заданной ценовой категории нет блюд");
+          return;
         }
     }
-
 
     //Вывести только со скидкой
     private static void viewOnlyDiscount() {
